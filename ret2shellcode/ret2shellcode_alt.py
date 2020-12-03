@@ -29,7 +29,7 @@ syscall
 
 mov rax,60
 syscall
-""").ljust(0x100,'\x00') + "flag.txt\x00"
+""")
 
 context.terminal = ['kitty', '-e', 'sh', '-c']
 io = process('./challs/chall(1)')
