@@ -28,3 +28,5 @@ def sla(a, b): return io.sendlineafter(a, b)
 def re(a): return io.recv(a)
 def reu(a): return io.recvuntil(a)
 def rl(): return io.recvline(False)
+
+io.interactive()
