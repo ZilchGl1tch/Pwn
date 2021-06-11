@@ -4,7 +4,7 @@ from pwn import *
 exe = ELF("")
 libc = ELF("")
 context.binary = exe
-context.terminal = "kitty -e tmux split -h".split()
+context.terminal = "kitty -e sh -c".split()
 context.log_level = "debug"
 IP, PORT = "", 0
 
