@@ -3,7 +3,7 @@ from pwn import *
 from time import sleep
 
 exe = ELF("BINARY")
-l{libc = ELF("LIBC")}
+l{libc = ELF("LIBC")}l
 context.binary = exe
 context.terminal = "kitty -e sh -c".split()
 context.log_level = "debug"
@@ -18,7 +18,7 @@ r{ip, port = "IP", PORT
 
 if len(sys.argv) > 1 and sys.argv[1] == "-r":
     io = remote(ip, port)
-el}if len(sys.argv) > 1 and sys.argv[1] == "-ng":
+el}rif len(sys.argv) > 1 and sys.argv[1] == "-ng":
     io = process(exe.path)
 else:
     io = gdb.debug(exe.path, gdbscript=breakpoints)
