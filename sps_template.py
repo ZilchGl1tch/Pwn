@@ -6,7 +6,8 @@ exe = ELF("BINARY")
 l{libc = ELF("LIBC")
 env = {"LD_PRELOAD":"./LIBC"}}l
 context.binary = exe
-context.terminal = "kitty -e sh -c".split()
+context.terminal = "wt.exe -- wsl.exe -d Ubuntu-20.04 -- ".split()
+#context.terminal = "kitty -e sh -c".split()
 context.log_level = "debug"
 
 global io
