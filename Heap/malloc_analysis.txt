@@ -1,0 +1,144 @@
+GLIBC-2.31
+
+_int_malloc():
+	- return NULL if error when converting request to size	
+
+	- use sysmalloc if no useable arenas
+
+	- check if size is in range of fastbin
+		- remove chunk from fastbin
+		- check for corruption {fastbin index check}
+		- allocate chunk (--FO)
+
+	- check if size is in range of smallbin
+		- check for corrpution {victim->bk->fd != victim}
+		- set inuse bit
+		- unlink without using unlink_chunk()
+			- bin->bk = victim->bk
+			- bk->fd = bin
+		- if not in main arean, set_non_main_arena()
+		- allocate chunk
+
+	- else its largebin
+		- if(&av->have_fastchunks), malloc_consolidate()
+		- largebin index for given size is saved to be used later
+	
+	- loop for unsorted chunks (maximum 1000 iterations)
+		- check for invalid size
+		- check for invalid next size
+		- check for mismatching next->prev_size
+		- check for corrupted double linked list
+		- check for invalid prev_inuse
+
+		- check if request in small bin range
+			- if only one chunk in unsorted bin, trim if required and unlink
+			- put the remainder into unsorted bin
+			- allocate the chunk
+
+		- place chunks in appropriate bins {large bins in sorted order}
+		- check for double linked list corruption {nextsize & bk}
+
+		- check if size is not in range of smallbin
+			- check if largest chunk is too small/bin is empty
+			- find smallest chunk that satisfies size requirement
+			- avoid removing first chunk
+			- unlink_chunk()
+			- split chunk if remainder is lesser than MINSIZE
+			- check for corruption in unsorted bin {fwd->bk != bck}
+			- put remainder in unsorted bin
+			- allocate chunk
+
+		- increment index
+		- loop
+			- search for non-empty bins using binmap
+			- if non-empty bin found empty, clear bit to signify empty, jump to next bin
+			- check if first chunk in bin is large enough
+			- unlink_chunk()
+			- split chunk if remainder is lesser than MINSIZE
+			- check for corrpution in unsorted bin
+			- put remainder in unsorted bin
+			- allocate chunk
+		- use_top
+			- check for corrupted top size
+			- split if remainder of top chunk greater than MINSIZE
+				- set remainder as top chunk
+				- allocate chunk
+			- else if(&av->have_fastchunks)
+				- malloc_consolidate()
+				- restore original bin index
+			- else use sysmalloc
+
+
+
+_int_free():
+	- check for valid pointer and check for valid size
+
+	- if size in fastbin range put in fastbin
+		- check for valid next size in fastbin
+		- free chunk
+		- set &av->have_fastchunks to true
+		- check for double free (lastly freed fastchunk != current chunk)
+		- link chunk
+		- check if chunk size of lastly free fastchunk is same as current chunk
+	
+	- if chunk is not mmaped
+		- check for corruption of top {p == av->top}
+		- check for corruption {contiguous, chunk within arena boundary}
+		- check for double free {chunk not marked as in use}
+		- check for valid size
+		- free chunk
+
+		- consolidate backward if prev_inuse set
+			- check for prevsize corruption
+			- unlink_chunk()
+		
+		- if nextchunk is not top chunk
+			- consolidate foward if next chunk not in use
+				- unlink_chunk()
+			- else clear prev_inuse bit of next chunk
+
+			- place chunk in unsorted bin
+				- check for corrupted double linked list
+				- if not in smallbin range, clear fd_nextsize and bk_nextsize
+		- else consolidate with top chunk
+
+		- for freeing very large chunk
+			- if chunk size is greater than FASTBIN_CONSOLIDATION_THRESHOLD
+				- malloc_consolidate() if (&av->have_fastchunks)
+			- trim top chunk if it exceeds trim_threshold
+			- try heap_trim()
+
+	- else munmap_chunk()
+
+
+
+malloc_consolidate():
+	- &av->have_fastchunks = false
+	- for every fastbin
+		- for every chunk in fastbin
+			- check for valid chunk size for given fastbin
+
+			- if prev_inuse not set
+				- current chunk = prev_chunk
+				- size incremented by prev_size
+				- check for corrupted size
+				- unlink_chunk()
+
+			- if nextchunk is not top chunk
+				- if nextchunk not in use
+					- size incremented by nextsize
+					- unlink_chunk(nextchunk)
+				- else clear prev_inuse bit of nextchunk
+
+				- NULL out fd_nextsize and bk_nextsize if not in smallbin range
+				- put consolidated chunk in unsorted bin
+
+			- else consolidate with top chunk
+
+
+			
+
+
+		
+
+	
