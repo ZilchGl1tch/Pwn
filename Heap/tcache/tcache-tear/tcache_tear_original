@@ -1,0 +1,11 @@
+--2021-10-05 20:46:44--  https://pwnable.tw/static/chall/tcache_tear
+Resolving pwnable.tw (pwnable.tw)... 172.105.238.127
+Connecting to pwnable.tw (pwnable.tw)|172.105.238.127|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 10152 (9.9K) [application/octet-stream]
+Saving to: ‘tcache_tear.1’
+
+     0K .........                                             100% 17.3M=0.001s
+
+2021-10-05 20:46:44 (17.3 MB/s) - ‘tcache_tear.1’ saved [10152/10152]
+
