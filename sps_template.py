@@ -1,13 +1,11 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 from pwn import *
 from time import sleep
 
 exe = ELF("BINARY")
 l{libc = ELF("LIBC")
-env = {"LD_PRELOAD":"LIBC"}}l
 context.binary = exe
-context.terminal = "wt.exe -- wsl.exe -d Ubuntu-20.04 -- ".split()
-#context.terminal = "kitty -e sh -c".split()
+context.terminal = "tmux splitw -h".split()
 context.log_level = "debug"
 
 global io
@@ -23,7 +21,7 @@ if len(sys.argv) > 1 and sys.argv[1] == "-r":
 el}rif len(sys.argv) > 1 and sys.argv[1] == "-ng":
     io = process(exe.path)
 else:
-    io = gdb.debug(exe.path, gdbscript=breakpoints)
+    io = process(f"gdbserver localhost:1337 ./{exe.path} --no-disable-randomization")
     
 re = lambda a: io.recv(a)
 reu = lambda a: io.recvuntil(a)
